@@ -1,3 +1,9 @@
+const Eth = require('./ethjs');
+
+
+const jQuery = $ = require('jquery');
+
+
 $(function ($) {
     "use strict";
     var $window = $(window);

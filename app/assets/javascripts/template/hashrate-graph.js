@@ -2,10 +2,11 @@
 
 call showHashrateGraph(...) to apply graph to canvas with ID 'chart-hashrate'
 
-NOTE: assumes mineable_token vue exists in the global scope 
+NOTE: assumes mineable_token vue exists in the global scope
  */
 
 
+ const Eth = require('./ethjs');
 
 /* color of the fonts used in chart labels */
 Chart.defaults.global.defaultFontColor = '#ffffff';
@@ -46,9 +47,9 @@ function toReadableThousandsLong(num_value, should_add_b_tags) {
     }
   }
   if(num_value < 10) {
-    var num_value_string = num_value.toFixed(1); 
+    var num_value_string = num_value.toFixed(1);
   } else {
-    var num_value_string = num_value.toFixed(0); 
+    var num_value_string = num_value.toFixed(0);
   }
   if(should_add_b_tags) {
     num_value_string = '<b>' + num_value_string + '</b>';
@@ -115,8 +116,8 @@ function toReadableHashrateForLogScale(hashrate, should_add_b_tags) {
   if(should_add_b_tags) {
     hashrate_string = '<b>' + hashrate_string + '</b>';
   }
-  /* TODO: the space  at the end here is used to add padding between the axis 
-           labels and the gridlines of the chart. This would be better solved 
+  /* TODO: the space  at the end here is used to add padding between the axis
+           labels and the gridlines of the chart. This would be better solved
            by using some king of chart.js setting */
   return hashrate_string + ' ' + final_unit + ' ';
 }
@@ -141,12 +142,12 @@ function ethBlockNumberToTimestamp(eth_block) {
 }
 
 /*Helper class for loading historical data from ethereum contract variables.
-  Initialize with an ethjs object, target contract address, and an integer 
+  Initialize with an ethjs object, target contract address, and an integer
   index that points to your desired variable in in the contract's storage area
   obj.addValueAtEthBlock(<block number>) starts a request to fetch
   and cache the value of your variable at that time. Note if you pass a
   non-integer block number it will be rounded.
-  
+
   obj.areAllValuesLoaded() will return true once all fetches are complete
   obj.getValues returns all requested data
  */
@@ -219,8 +220,8 @@ class contractValueOverTime {
   }
   addValueAtEthBlock(eth_block_num, is_retry, retry_delay) {
     /* read value from contract @ specific block num, save to this.states
-       detail: load eth provider with a request to load value from 
-       block @ num. Callback is anonymous function which pushes the 
+       detail: load eth provider with a request to load value from
+       block @ num. Callback is anonymous function which pushes the
        value onto this.states */
     let cv_obj = this;
     if(is_retry == null) {
@@ -235,7 +236,7 @@ class contractValueOverTime {
 
     //console.log('requested', this.storage_index, '@ block', eth_block_num)
 
-    this.eth.getStorageAt(this.contract_address, 
+    this.eth.getStorageAt(this.contract_address,
                           new Eth.BN(this.storage_index, 10),
                           eth_block_num.toString(10))
     .then(
@@ -280,7 +281,7 @@ class contractValueOverTime {
     this.sorted = true;
   }
   /* iterate through already loaded values. Wherever a state change is
-  seen, queue another value load from the blockchain halfway between 
+  seen, queue another value load from the blockchain halfway between
   state A and state B. Goal is to get closer to the actual eth block
   number where the state transition occurs. */
   increaseTransitionResolution() {
@@ -437,7 +438,7 @@ function generateHashrateGraph(eth, max_target_bn, ideal_block_time_seconds, tar
           && eras_per_block_data[step].x > difficulty_change_block_num
           && eras_per_block_data[step-1].x < difficulty_change_block_num) {
 
-        /* make a new half-way difficulty that takes the duration of each 
+        /* make a new half-way difficulty that takes the duration of each
            seperate difficulty into accout  */
 
         var step_size_in_eth_blocks = eras_per_block_data[step].x - eras_per_block_data[step-1].x;
@@ -466,10 +467,10 @@ function generateHashrateGraph(eth, max_target_bn, ideal_block_time_seconds, tar
     return chart_data;
   }
 
-  var difficulty_data = convertValuesToChartData(target_values, 
+  var difficulty_data = convertValuesToChartData(target_values,
                                                  (x)=>{return max_target_bn.div(x)});
   var era_data = convertValuesToChartData(era_values);
-  // var total_supply_data = convertValuesToChartData(tokens_minted_values, 
+  // var total_supply_data = convertValuesToChartData(tokens_minted_values,
   //                                                  (x)=>{return x / 10**8});
   var eras_per_block_data = getErasPerBlockFromEraData(era_values);
   //console.log('era data', eras_per_block_data);
@@ -504,8 +505,8 @@ function generateHashrateGraph(eth, max_target_bn, ideal_block_time_seconds, tar
             var label = ''
 
             /* Note: might have issues here if you dont set dataset label */
-            label = ethBlockNumberToDateStr(tooltipItem.xLabel) 
-                    + ': ' 
+            label = ethBlockNumberToDateStr(tooltipItem.xLabel)
+                    + ': '
                     + toReadableHashrate(tooltipItem.yLabel);
             //console.log(tooltipItem, data)
             return label;
@@ -562,7 +563,7 @@ function generateHashrateGraph(eth, max_target_bn, ideal_block_time_seconds, tar
         }]
       }
     },
-  }); 
+  });
 }
 
 async function show_progress(value){
@@ -613,7 +614,7 @@ async function showHashrateGraph(eth, contract_address, max_target_string, ideal
     mining_target_values.addValueAtEthBlock(block_num);
   }
   mining_target_values.addValueAtEthBlock(end_eth_block);
-  
+
   // wait on all pending eth log requests to finish (with progress)
   while(!mining_target_values.areAllValuesLoaded()
         //|| !tokens_minted_values.areAllValuesLoaded()
@@ -629,7 +630,7 @@ async function showHashrateGraph(eth, contract_address, max_target_string, ideal
   mining_target_values.sortValues();
   era_values.sortValues();
   //tokens_minted_values.sortValues();
-  
+
   // TODO: remove this when we are sure it is fixed
   era_values.deleteLastPointIfZero();
 

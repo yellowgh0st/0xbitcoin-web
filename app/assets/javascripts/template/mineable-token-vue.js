@@ -1,4 +1,8 @@
 
+const $ = require('jquery');
+
+import Vue from 'vue'
+
 function to_readable_thousands(number, unit_type, decimal_count) {
   let units = []
   if (unit_type === "long") {
@@ -23,7 +27,7 @@ function to_readable_thousands(number, unit_type, decimal_count) {
 }
 
 
-mineable_token = new Vue({
+var mineable_token = new Vue({
   el: '#mineable-token-stats',
   data: {
     address: null,
