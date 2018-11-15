@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
 <!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
 <!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
@@ -32,9 +32,9 @@
 	<meta name="description" content="">
 	<title> 0xBitcoin </title>
 	<!--Favicon-->
-	<link rel="shortcut icon" type="image/png" href="img/favicon.png" />
+	<link rel="shortcut icon" type="image/png" href="app/assets/img/favicon.png" />
 	<!--Bootstrap Stylesheet-->
-	
+
 </head>
 
 <body class="body-class">
@@ -52,7 +52,7 @@
 		<nav class="navbar navbar-expand-lg navbar-light p-0">
 			<div class="container">
 				<a class="navbar-brand" href="#welcomeArea">
-					<img width=75 height=75 src="img/logo.png">   0xBitcoin
+					<img width=75 height=75 src="app/assets/img/logo.png">   0xBitcoin
 				</a>
 				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
 				 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -107,7 +107,7 @@
 								</div>
 								<div class="col-md-6">
 									<div class="right">
-										<img width="339" heigh="250" src="img/mine.gif">
+										<img width="339" heigh="250" src="app/assets/img/mine.gif">
 									</div>
 								</div>
 							</div>
@@ -118,25 +118,25 @@
 
 
             <a class="nav-item" href="https://metamask.io" target="_blank">
-              <img src="img/metamask.png" class="shadow hover-effects" style="border-radius: 50% " height="100" width="100">
+              <img src="app/assets/img/metamask.png" class="shadow hover-effects" style="border-radius: 50% " height="100" width="100">
               Metamask</a>
 
 
 
               <a class="nav-item" href="https://0xbitcoin.org/wallet" target="_blank">
-              <img src="img/logo-white.png" class="shadow hover-effects" style="border-radius: 50% " height="100" width="100">
+              <img src="app/assets/img/logo-white.png" class="shadow hover-effects" style="border-radius: 50% " height="100" width="100">
               WebWallet</a>
 
 
 
 							<a class="nav-item" href="https://trustwalletapp.com/" target="_blank">
-              <img src="img/trust.png" class="shadow hover-effects" style="border-radius: 50% " height="100" width="100">
+              <img src="app/assets/img/trust.png" class="shadow hover-effects" style="border-radius: 50% " height="100" width="100">
 						TrustWallet</a>
 
 
 
 							<a class="nav-item" href="https://www.ledgerwallet.com/products/ledger-nano-s" target="_blank">
-                <img src="img/ledger.png" class="shadow hover-effects" style="border-radius: 50% " height="100" width="100">
+                <img src="app/assets/img/ledger.png" class="shadow hover-effects" style="border-radius: 50% " height="100" width="100">
 							NanoWallet</a>
 
 
@@ -184,7 +184,7 @@
 				</div>
 				<div class="col-md-6">
 					<div class="right">
-						<img class="img-fluid" src="img/about.png" alt="">
+						<img class="img-fluid" src="app/assets/img/about.png" alt="">
 					</div>
 				</div>
 			</div>
@@ -260,44 +260,7 @@
 																			<div id="fundraiser-progress-bar">0%</div>
 																		</div>
 																	</div>
-																	<script type="text/javascript" src="js/ethjs.js"></script>
-																	<script type="text/javascript">
 
-																			function getEthBalance(address){
-																					return new Eth(new Eth.HttpProvider("https://mainnet.infura.io/MnFOXCPE2oOhWpOCyEBT")).getBalance(address, "latest");
-																			}
-
-																			function moveProgressBar(percent, element_id) {
-																					let elem = document.getElementById(element_id);
-																					let width = 0;
-																					let interval_id = setInterval(function(){
-																							if (width >= percent) {
-																									clearInterval(interval_id);
-																							} else {
-																									width += Math.max(0.001, (percent-width)/5)
-																									elem.style.width = width + '%';
-																									elem.innerHTML = Math.round(width) * 1 + '%';
-																							}
-																					}, 33.333);
-
-																			}
-
-																			function loadData() {
-																					let element_id = "fundraiser-progress-bar";
-																					let address = "0xc22E34923F14f1663DdAB4956F92784DD4FE360a";
-																					let name = "CCN Donation Fund";
-																					let goal_balance_eth = 9;
-																					getEthBalance(address).then((result) => {
-																							return 100 * Number(Eth.fromWei(result, "ether")) / goal_balance_eth
-																					}).then((result) => {
-																							moveProgressBar(result, element_id)
-																					}).catch((error) => {
-																							console.log("err", error)
-																					});
-																			}
-
-																			loadData();
-																	</script>
 														</div>
 													</div>
 												</div>
@@ -361,7 +324,7 @@
 				</div>
 				<div class="col-md-6">
 					<div class="right">
-						<img class="img-fluid" src="img/invest.png" alt="">
+						<img class="img-fluid" src="app/assets/img/invest.png" alt="">
 					</div>
 				</div>
 			</div>
@@ -493,7 +456,7 @@
 				<div class="col-md-6">
 					<div class="box">
 						<div class="img">
-							<img class="img-fluid" src="img/shoose/c1.png" alt="">
+
 						</div>
 						<div class="content">
 							<h3>
@@ -514,7 +477,7 @@
 				<div class="col-md-6">
 					<div class="box">
 						<div class="img">
-							<img class="img-fluid" src="img/shoose/c2.png" alt="">
+
 						</div>
 						<div class="content">
 							<h3>
@@ -535,7 +498,7 @@
 				<div class="col-md-6">
 					<div class="box">
 						<div class="img">
-							<img class="img-fluid" src="img/shoose/c3.png" alt="">
+
 						</div>
 						<div class="content">
 							<h3>
@@ -556,7 +519,7 @@
 				<div class="col-md-6">
 					<div class="box">
 						<div class="img">
-							<img class="img-fluid" src="img/shoose/c4.png" alt="">
+
 						</div>
 						<div class="content">
 							<h3>
@@ -598,43 +561,8 @@
 			</div>
 			<div class="row paypatner">
 				<div class="col-12 text-center">
-					<ul>
-						<li>
-							<a href="#">
-								<img class="img-fluid" src="img/payment/p1.png" alt="">
-							</a>
-						</li>
-						<li>
-							<a href="#">
-								<img class="img-fluid" src="img/payment/p2.png" alt="">
-							</a>
-						</li>
-						<li>
-							<a href="#">
-								<img class="img-fluid" src="img/payment/p3.png" alt="">
-							</a>
-						</li>
-						<li>
-							<a href="#">
-								<img class="img-fluid" src="img/payment/p4.png" alt="">
-							</a>
-						</li>
-						<li>
-							<a href="#">
-								<img class="img-fluid" src="img/payment/p5.png" alt="">
-							</a>
-						</li>
-						<li>
-							<a href="#">
-								<img class="img-fluid" src="img/payment/p6.png" alt="">
-							</a>
-						</li>
-						<li>
-							<a href="#">
-								<img class="img-fluid" src="img/payment/p7.png" alt="">
-							</a>
-						</li>
-					</ul>
+
+
 				</div>
 			</div>
 			<div class="row calculate justify-content-center">
@@ -1008,7 +936,7 @@
 					<div class="box">
 						<div class="logo">
 							<a href="#">
-							<img width=75 height=75 src="img/logo.png">	0xBitcoin.org
+							<img width=75 height=75 src="app/assets/img/logo.png">	0xBitcoin.org
 							</a>
 						</div>
 
@@ -1134,31 +1062,9 @@
 	</div>
 	<!--End ClickToTop-->
 
-	<!--Vue.js: used by Token Stats (mineable-token-vue.js)-->
-	<script src="https://cdn.jsdelivr.net/npm/vue"></script>
 	<!--Chart.js: used by Hashrate Graph (hashrate-graph.js)-->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
-    <!--0xBitcoin Contract ABI-->
-	<script src="js/abi.js"></script>
-    <!--Token Stats-->
-	<script src="js/mineable-token-vue.js"></script>
-    <!--Hashrate Graph-->
-	<script src="js/hashrate-graph.js"></script>
-	<!--jQuery JS-->
-	<script src="js/jquery.min.js"></script>
-	<!--Bootstrap JS-->
-	<script src="js/bootstrap.min.js"></script>
-	<script src="js/popper.js"></script>
-	<!--Main-->
-	<script src="js/main.js"></script>
 
-	<!--Load Contract Stats/Graph-->
-	<script type="text/javascript">
-		/* TODO: call this from a better place; the only requirement is  */
-		$(document).ready(function() {
-			console.log("DOMready");
-			mineable_token.updateContractStats('0xB6eD7644C69416d67B522e20bC294A9a9B405B31');
-		});
-	</script>
+
+
 
 </body>
