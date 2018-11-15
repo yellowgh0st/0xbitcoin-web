@@ -86,9 +86,7 @@ $(document).ready(async function(){
 
       wallet.init(alertRenderer,ethHelper);
     }
-
-
-
+ 
 
 
 
