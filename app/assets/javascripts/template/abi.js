@@ -764,3 +764,6 @@ const tokenABI = [
       "type":"event"
    }
 ];
+
+
+module.exports.tokenABI = tokenABI;
