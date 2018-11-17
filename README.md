@@ -3,6 +3,12 @@
 
 BASIC SETUP (needs Node8)
 
+## installing Node
+
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+
+
+## booting the server
 
 npm install   (# See Note A)
 
@@ -29,7 +35,7 @@ npm run webpack
 npm install -g node-gyp
 
 sudo apt-get install build-essential
- 
+
 You may need to do..
 sudo apt-get install python2.7
 npm config set python python2.7
