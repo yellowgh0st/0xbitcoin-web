@@ -5,13 +5,9 @@ const $ = require('jquery');
 const Vue = require('vue');
 const Popper = require('./template/popper');
 
-const Chart = require('./template/chart.min');
 
 
 const bootstrap = require('./template/bootstrap.min');
-const hashrateGraph = require('./template/hashrate-graph');
-const mineable_token = require('./template/mineable-token-vue.js');
-const abi = require('./template/abi');
 const main = require('./template/main');
 
 
@@ -39,7 +35,7 @@ function moveProgressBar(percent, element_id) {
 
 }
 
-function loadData() {
+function loadFundraiserData() {
     let element_id = "fundraiser-progress-bar";
     let address = "0xc22E34923F14f1663DdAB4956F92784DD4FE360a";
     let name = "CCN Donation Fund";
@@ -55,8 +51,7 @@ function loadData() {
 
 $(document).ready(function() {
   console.log("DOMready");
-  mineable_token.updateContractStats('0xB6eD7644C69416d67B522e20bC294A9a9B405B31');
 
-  loadData();
+  loadFundraiserData();
 
 });

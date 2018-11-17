@@ -1,4 +1,6 @@
-
+const hashrateGraph = require("./hashrate-graph");
+const tokenABI = require("./abi");
+const Eth = require('./ethjs');
 const $ = require('jquery');
 
 import Vue from 'vue'
@@ -17,7 +19,7 @@ function to_readable_thousands(number, unit_type, decimal_count) {
     console.log('bad unit type');
     fail;
   }
-  for (i in units) {
+  for (var i in units) {
     if (number < 1000) {
       return number.toFixed(decimal_count) + units[i];
     }
@@ -57,6 +59,10 @@ var mineable_token = new Vue({
     max_target: null,
     ideal_eth_blocks_per_reward: null,
   },
+  mounted: function(){
+    console.log('mounted');
+    this.updateContractStats("0xB6eD7644C69416d67B522e20bC294A9a9B405B31");
+  },
   computed: {
     calculatedHashrate: function () {
       let SECONDS_PER_ETH_BLOCK = 15;
@@ -86,12 +92,6 @@ var mineable_token = new Vue({
     },
   },
   methods: {
-    // updateHashrate: _.debounce(function (e) {
-    //   this.hashrate = e.target.value
-    // }, 300),
-    // setDifficulty: function (difficulty) {
-    //   this.difficulty = difficulty;
-    // },
     updateHashrateGraph: function () {
       let SECONDS_PER_ETH_BLOCK = 15;
       let GRAPH_HISTORY_DAYS = 120;
@@ -99,13 +99,14 @@ var mineable_token = new Vue({
       this._eth.blockNumber().then((result) => {
         let current_eth_block = parseInt(result.toString(10));
         let earliest_eth_block = current_eth_block - (GRAPH_HISTORY_DAYS * 24 * 3600 / SECONDS_PER_ETH_BLOCK);
-        showHashrateGraph(this._eth,
-                          this.address,
-                          this.max_target,
-                          this.ideal_eth_blocks_per_reward,
-                          earliest_eth_block,
-                          current_eth_block - 8,
-                          GRAPH_NUM_POINTS);
+        hashrateGraph.showHashrateGraph(this._eth,
+                                        this.address,
+                                        this.max_target,
+                                        this.ideal_eth_blocks_per_reward,
+                                        this.current_eth_block,
+                                        earliest_eth_block,
+                                        current_eth_block - 8,
+                                        GRAPH_NUM_POINTS);
       });
     },
     updateContractStats: function (address) {
@@ -120,7 +121,7 @@ var mineable_token = new Vue({
         fail;
       }
       this._eth = new Eth(new Eth.HttpProvider("https://mainnet.infura.io/MnFOXCPE2oOhWpOCyEBT"));
-      this._token = this._eth.contract(tokenABI).at(this.address);
+      this._token = this._eth.contract(tokenABI.tokenABI).at(this.address);
 
       this._eth.blockNumber().then((result) => {this.current_eth_block = parseInt(result.toString(10))})
 
@@ -129,12 +130,14 @@ var mineable_token = new Vue({
       this._token.latestDifficultyPeriodStarted().then((result) => {
         this.latest_difficulty_started = parseInt(result[0].toString(10))
         // get previous value for latestDifficultyPeriodStarted
+        // TODO: fix this, it does not work but would be very useful for hashrate estimation
         this._eth.getStorageAt(this.address,
                                new Eth.BN('6', 10),
                                this.latest_difficulty_started).then((result) => {
                                 this.previous_latest_difficulty_started = parseInt(result[0].toString(10))
                                })
         // get previous value for miningTarget
+        // TODO: fix this, it does not work but would be very useful for hashrate estimation
         this._eth.getStorageAt(this.address,
                                new Eth.BN('11', 10),
                                this.latest_difficulty_started).then((result) => {
@@ -149,7 +152,7 @@ var mineable_token = new Vue({
         /* get contract events in the last approx 48 hours worth of eth blocks */
         /* more info: https://github.com/ethjs/ethjs/blob/master/docs/user-guide.md#ethgetlogs */
         /* and https://ethereum.stackexchange.com/questions/12950/what-are-event-topics/12951#12951 */
-        recent_events = []
+        let recent_events = []
         let decimals = this.decimals
         this._eth.getLogs({
           fromBlock: this.last_reward_eth_block_number - (48 * 3600 / 15),
@@ -209,12 +212,6 @@ var mineable_token = new Vue({
                 break;
             }
           });
-
-
-          // for (i in this._recent_events) {
-          //   console.log(this._recent_events[i]);
-          // }
-
 
         });
         this._recent_events = recent_events;

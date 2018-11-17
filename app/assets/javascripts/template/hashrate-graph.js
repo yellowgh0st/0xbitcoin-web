@@ -24,37 +24,12 @@ let y_axis_label_color = '#ffffff';
 let axis_label_font_size = 13;
 
 
-
 /* intrinsic values */
 const _ZERO_BN = new Eth.BN(0, 10);
 
 /* sleep for given number of milliseconds. note: must be called with 'await' */
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-/* convert number to a readable string ("244 Thousand", "3 Billion") */
-function toReadableThousandsLong(num_value, should_add_b_tags) {
-  units = ['', 'Thousand', 'Million', 'Billion'];
-  var final_unit = 'Trillion';
-  for(idx in units) {
-    var unit = units[idx];
-    if(num_value < 1000) {
-      final_unit = unit;
-      break;
-    } else {
-      num_value /= 1000;
-    }
-  }
-  if(num_value < 10) {
-    var num_value_string = num_value.toFixed(1);
-  } else {
-    var num_value_string = num_value.toFixed(0);
-  }
-  if(should_add_b_tags) {
-    num_value_string = '<b>' + num_value_string + '</b>';
-  }
-  return num_value_string + ' ' + final_unit;
 }
 
 /* convert number to a readable hashrate string ("244.32 Gh/s", "3.05 Th/s") */
@@ -122,23 +97,21 @@ function toReadableHashrateForLogScale(hashrate, should_add_b_tags) {
   return hashrate_string + ' ' + final_unit + ' ';
 }
 
-/* Load latest eth block and use it (and current time) to guess timestamp of a
-   given past eth block. Value is returned as a formatted date/time string.
+/* 
+    Function generator. Takes the most recent eth block and returns a function
+    which can be used to convert eth blocks to date strings.
 
-   TODO: uses the mineable_token vue global object - should not assume
-         mineable_token object exists
+    Use it (and current time) to guess timestamp of a given past eth block. 
+    Value is returned as a formatted date/time string.
  */
-function ethBlockNumberToDateStr(eth_block) {
-  let SECONDS_PER_ETH_BLOCK = 15; // TODO: save eth block time constant somewhere
+function createEthDateFunction(current_eth_block) {
+  return (eth_block) => {
+    let SECONDS_PER_ETH_BLOCK = 15;
 
-  var options = { year: undefined, month: 'short', day: 'numeric' };
-  let date = new Date(Date.now() - ((mineable_token.current_eth_block - eth_block)*SECONDS_PER_ETH_BLOCK*1000));
-  return date.toLocaleDateString(undefined, options);
-}
-function ethBlockNumberToTimestamp(eth_block) {
-  let SECONDS_PER_ETH_BLOCK = 15; // TODO: save eth block time constant somewhere
-  /* TODO: use web3 instead, its probably more accurate */
-  return new Date(Date.now() - ((mineable_token.current_eth_block - eth_block)*SECONDS_PER_ETH_BLOCK*1000)).toLocaleString()
+    var options = { year: undefined, month: 'short', day: 'numeric' };
+    let date = new Date(Date.now() - ((current_eth_block - eth_block)*SECONDS_PER_ETH_BLOCK*1000));
+    return date.toLocaleDateString(undefined, options);
+  }
 }
 
 /*Helper class for loading historical data from ethereum contract variables.
@@ -178,7 +151,6 @@ class contractValueOverTime {
   /* fetch query_count states between start_block_num and end_block_num */
   async addValuesInRange(start_block_num, end_block_num, query_count) {
     var stepsize = (end_block_num-start_block_num) / query_count;
-    //console.log('stepsize', stepsize);
 
     for (var count = 0; count < query_count; count += 1) {
       let block_num = end_block_num - (stepsize*count);
@@ -198,7 +170,6 @@ class contractValueOverTime {
       /* for some reason, this is how infura 'fails' to fetch a value */
       /* TODO: only re-try a certain number of times */
       if (value == '0x' || value == null) {
-        //console.log('cv_obj', cv_obj.storage_index.padStart(2), 'block', eth_block_num, ': got a bad value (', value, '), retrying in ', retry_delay, 'ms...');
         await sleep(retry_delay);
         /* 2nd param indicidates is_retry, 3rd is wait time (for exponential backoff) */
         cv_obj.addValueAtEthBlock(eth_block_num, true, retry_delay*2);
@@ -208,7 +179,6 @@ class contractValueOverTime {
         var hex_str = value.substr(2, 64);
         var value_bn = new Eth.BN(hex_str, 16)
 
-        //console.log('cv_obj', cv_obj.storage_index.padStart(2), 'block', eth_block_num, ': saving ', value);
         cv_obj.sorted = false;
         /* [block num, value @ block num, timestamp of block num] */
         var len = block_states.push([eth_block_num, value_bn, '']);
@@ -234,8 +204,6 @@ class contractValueOverTime {
     /* make sure we only request integer blocks */
     eth_block_num = Math.round(eth_block_num)
 
-    //console.log('requested', this.storage_index, '@ block', eth_block_num)
-
     this.eth.getStorageAt(this.contract_address,
                           new Eth.BN(this.storage_index, 10),
                           eth_block_num.toString(10))
@@ -243,9 +211,8 @@ class contractValueOverTime {
       this._getSaveStateFunction(this.states, eth_block_num, retry_delay)
     ).catch(async (error) => {
       if(error.message && error.message.substr(error.message.length-4) == 'null') {
-        //console.log('got null from infura, retrying...');
+        console.log('got null from infura, retrying...');
       } else {
-        //console.log(error);
         console.log('error reading block storage:', error);
       }
       await sleep(retry_delay);
@@ -254,15 +221,8 @@ class contractValueOverTime {
       return;
     });
 
-    // if(is_retry) {
-    //   console.log('cv_obj', this.storage_index.padStart(2), 'block', eth_block_num, ': queued (retry, timeout:', retry_delay, ')');
-    // } else {
-    //   console.log('cv_obj', this.storage_index.padStart(2), 'block', eth_block_num, ': queued');
-    // }
-
   }
   areAllValuesLoaded() {
-    //console.log('cv_obj', this.storage_index.padStart(2), ': values loaded: ', this.states.length, '/', this.expected_state_length);
     return this.expected_state_length == this.states.length;
   }
   async waitUntilLoaded() {
@@ -369,7 +329,7 @@ class contractValueOverTime {
   }
 }
 
-function generateHashrateGraph(eth, max_target_bn, ideal_block_time_seconds, target_cv_obj, era_cv_obj) {
+function generateHashrateGraph(eth, max_target_bn, ideal_block_time_seconds, target_cv_obj, era_cv_obj, ethBlockNumberToDateStr) {
   var target_values = target_cv_obj.getValues;
   var era_values = era_cv_obj.getValues;
 
@@ -408,7 +368,6 @@ function generateHashrateGraph(eth, max_target_bn, ideal_block_time_seconds, tar
         x: era_values[step][0],
         y: eras_per_eth_block,
       })
-      //console.log('log', era_values[step][0], value_mod_function(era_values[step][1]))
     }
     return chart_data;
   }
@@ -427,8 +386,6 @@ function generateHashrateGraph(eth, max_target_bn, ideal_block_time_seconds, tar
         difficulty_change_block_num = difficulty_data[difficulty_data_index+1].x;
         difficulty_data_index += 1;
       }
-
-      //console.log('diff chg @', difficulty_change_block_num);
 
       var difficulty = difficulty_data[difficulty_data_index].y.toNumber();
 
@@ -490,7 +447,6 @@ function generateHashrateGraph(eth, max_target_bn, ideal_block_time_seconds, tar
             data: hashrate_data,
             fill: true,
             yAxisID: 'first-y-axis',
-            //fill: 'origin',
         }]
     },
 
@@ -508,7 +464,6 @@ function generateHashrateGraph(eth, max_target_bn, ideal_block_time_seconds, tar
             label = ethBlockNumberToDateStr(tooltipItem.xLabel)
                     + ': '
                     + toReadableHashrate(tooltipItem.yLabel);
-            //console.log(tooltipItem, data)
             return label;
           }
         }
@@ -539,12 +494,7 @@ function generateHashrateGraph(eth, max_target_bn, ideal_block_time_seconds, tar
           id: 'first-y-axis',
           position: 'left',
           //type: 'linear',
-          type: 'logarithmic',  /* hard to read */
-          //scaleLabel: {
-            //display: true,
-            //labelString: 'Network Hashrate',
-            //fontColor: y_axis_label_color,
-          //},
+          type: 'logarithmic',
           gridLines: {
             color: gridline_color,
             zeroLineColor: gridline_zero_color,
@@ -558,7 +508,6 @@ function generateHashrateGraph(eth, max_target_bn, ideal_block_time_seconds, tar
               return toReadableHashrateForLogScale(value);
             },
             min: 0,
-            /*stepSize: 1000,*/
           }
         }]
       }
@@ -566,16 +515,12 @@ function generateHashrateGraph(eth, max_target_bn, ideal_block_time_seconds, tar
   });
 }
 
-async function show_progress(value){
-  log('updating progress.. (', value, ')');
-  el('#difficultystats').innerHTML = '<div class="">Loading info from the blockchain... <span style="font-weight:600;">' + value + '</span></div>';
-}
 
-
-async function showHashrateGraph(eth, contract_address, max_target_string, ideal_eth_blocks_per_reward, start_eth_block, end_eth_block, num_search_points){
+async function showHashrateGraph(eth, contract_address, max_target_string, ideal_eth_blocks_per_reward, current_eth_block, start_eth_block, end_eth_block, num_search_points){
   let SECONDS_PER_ETH_BLOCK = 15; // TODO: save eth block time constant somewhere
   let max_target_bn = new Eth.BN(max_target_string, 10);
   let ideal_block_time_seconds = ideal_eth_blocks_per_reward * SECONDS_PER_ETH_BLOCK;
+
   // 'lastDifficultyPeriodStarted' is at location 6
   // NOTE: it is important to make sure the step size is small enough to
   //       capture all difficulty changes. For 0xBTC once/day is more than
@@ -583,22 +528,14 @@ async function showHashrateGraph(eth, contract_address, max_target_string, ideal
   var last_diff_start_blocks = new contractValueOverTime(eth, contract_address, '6', 'diffStartBlocks');
   // 'reward era' is at location 7
   var era_values = new contractValueOverTime(eth, contract_address, '7', 'eraValues');
-  // 'tokens minted' is at location 20
-  //var tokens_minted_values = new contractValueOverTime(eth, contract_address, '20', 'tokensMinted');
   // 'mining target' is at location 11
   var mining_target_values = new contractValueOverTime(eth, contract_address, '11', 'miningTargets');
 
   last_diff_start_blocks.addValuesInRange(start_eth_block, end_eth_block, num_search_points);
   era_values.addValuesInRange(start_eth_block, end_eth_block, num_search_points);
-  //tokens_minted_values.addValuesInRange(start_eth_block, end_eth_block, num_search_points);
 
-
-  // wait on all pending eth log requests to finish (with progress)
-  while(!last_diff_start_blocks.areAllValuesLoaded()) {
-    console.log('graph waiting 1...');
-    await sleep(1000);
-  }
-  //await last_diff_start_blocks.waitUntilLoaded();
+  console.log('graph waiting 1...');
+  await last_diff_start_blocks.waitUntilLoaded();
 
   // sort and archive before removing duplicates
   last_diff_start_blocks.sortValues();
@@ -615,24 +552,19 @@ async function showHashrateGraph(eth, contract_address, max_target_string, ideal
   }
   mining_target_values.addValueAtEthBlock(end_eth_block);
 
-  // wait on all pending eth log requests to finish (with progress)
-  while(!mining_target_values.areAllValuesLoaded()
-        //|| !tokens_minted_values.areAllValuesLoaded()
-        || !era_values.areAllValuesLoaded()
-        || !last_diff_start_blocks.areAllValuesLoaded()) {
-    console.log('graph waiting 2...');
-    await sleep(1000);
-  }
-  //await mining_target_values.waitUntilLoaded();
-  //await tokens_minted_values.waitUntilLoaded();
-  //await era_values.waitUntilLoaded();
+  console.log('graph waiting 2...');
+  await mining_target_values.waitUntilLoaded();
+  await era_values.waitUntilLoaded();
 
   mining_target_values.sortValues();
   era_values.sortValues();
-  //tokens_minted_values.sortValues();
 
   // TODO: remove this when we are sure it is fixed
   era_values.deleteLastPointIfZero();
 
-  generateHashrateGraph(eth, max_target_bn, ideal_block_time_seconds, mining_target_values, era_values);
+  let ethBlockNumberToDateStr = createEthDateFunction(current_eth_block);
+
+  generateHashrateGraph(eth, max_target_bn, ideal_block_time_seconds, mining_target_values, era_values, ethBlockNumberToDateStr);
 }
+
+module.exports.showHashrateGraph = showHashrateGraph;
