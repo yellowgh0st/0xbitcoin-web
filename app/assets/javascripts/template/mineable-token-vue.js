@@ -88,7 +88,11 @@ var mineable_token = new Vue({
       return to_readable_thousands(this.difficulty, "long", 1);
     },
     readableContractOperations: function () {
-      return this.contract_operations.toLocaleString();
+      if (this.contract_operations == 0) {
+        return "--";
+      } else {
+        return this.contract_operations.toLocaleString();
+      }
     },
   },
   methods: {
