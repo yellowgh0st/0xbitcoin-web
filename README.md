@@ -7,6 +7,9 @@ BASIC SETUP (needs Node8)
 
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
 
+close and reopen terminal
+
+nvm install 8
 
 ## booting the server
 
