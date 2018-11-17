@@ -5,8 +5,8 @@ call showHashrateGraph(...) to apply graph to canvas with ID 'chart-hashrate'
 NOTE: assumes mineable_token vue exists in the global scope
  */
 
-
- const Eth = require('./ethjs');
+const Chart = require('./chart.min');  
+const Eth = require('./ethjs');
 
 /* color of the fonts used in chart labels */
 Chart.defaults.global.defaultFontColor = '#ffffff';

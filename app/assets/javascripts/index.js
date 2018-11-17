@@ -13,6 +13,7 @@ const main = require('./template/main');
 
 import Fundraiser from './template/fundraiser'
 
+const mineable_token = require('./template/mineable-token-vue.js'); 
 import TokenStats from './template/tokenStats'
 
 
